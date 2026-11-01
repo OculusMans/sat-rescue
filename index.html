@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sat Rescue</title>
+<style>
+  /* Графит + оранжевый в духе Apple. Тёмная графитовая тема по умолчанию, светлая — по настройке системы. */
+  :root {
+    --bg: #161617; --bg-glow: #2a1d0e; --card: rgba(44, 44, 46, .72); --card-solid: #2c2c2e; --well: #1c1c1e;
+    --text: #f5f5f7; --muted: #98989d; --line: rgba(255, 255, 255, .08); --track: #3a3a3c;
+    --accent: #ff9f0a; --accent-2: #ff7a00; --accent-text: #1c1c1e; --ok: #30d158; --err: #ff453a;
+    --shadow: 0 1px 0 rgba(255, 255, 255, .04) inset, 0 20px 40px -24px rgba(0, 0, 0, .8);
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #f5f5f7; --bg-glow: #ffe9cf; --card: rgba(255, 255, 255, .8); --card-solid: #ffffff; --well: #f2f2f4;
+      --text: #1d1d1f; --muted: #6e6e73; --line: rgba(0, 0, 0, .08); --track: #e3e3e8;
+      --accent: #ff9500; --accent-2: #f06a00; --accent-text: #ffffff; --ok: #248a3d; --err: #d70015;
+      --shadow: 0 20px 40px -28px rgba(0, 0, 0, .25);
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f5f7; --bg-glow: #ffe9cf; --card: rgba(255, 255, 255, .8); --card-solid: #ffffff; --well: #f2f2f4;
+    --text: #1d1d1f; --muted: #6e6e73; --line: rgba(0, 0, 0, .08); --track: #e3e3e8;
+    --accent: #ff9500; --accent-2: #f06a00; --accent-text: #ffffff; --ok: #248a3d; --err: #d70015;
+    --shadow: 0 20px 40px -28px rgba(0, 0, 0, .25);
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body {
+    margin: 0; min-height: 100vh; color: var(--text);
+    background: radial-gradient(900px 480px at 50% -160px, var(--bg-glow), transparent 70%), var(--bg);
+    font: 17px/1.47 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Segoe UI", Inter, sans-serif;
+    letter-spacing: -0.012em;
+  }
+  main { max-width: 600px; margin: 0 auto; padding: 72px 16px 80px; }
+  .eyebrow { color: var(--accent); font-weight: 600; font-size: 15px; margin: 0 0 10px; letter-spacing: 0; }
+  h1 {
+    font: 700 clamp(40px, 9vw, 56px)/1.05 -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "Segoe UI", sans-serif;
+    letter-spacing: -0.035em; margin: 0 0 16px;
+  }
+  h1 em { font-style: normal; background: linear-gradient(100deg, var(--accent) 10%, var(--accent-2) 90%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { color: var(--muted); font-size: 19px; margin: 0 0 40px; max-width: 34em; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 24px;
+    margin-bottom: 14px; box-shadow: var(--shadow); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px);
+  }
+  .card h2 { display: flex; align-items: center; gap: 10px; font-size: 21px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 18px; }
+  .card h2 .n {
+    display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%;
+    background: var(--accent); color: var(--accent-text); font-size: 14px; font-weight: 700; letter-spacing: 0;
+  }
+  .card h2.plain { font-size: 17px; color: var(--muted); font-weight: 600; }
+  button {
+    font: inherit; font-weight: 600; border: 0; border-radius: 980px; padding: 14px 22px; cursor: pointer; width: 100%;
+    background: linear-gradient(180deg, var(--accent), var(--accent-2)); color: var(--accent-text);
+    transition: transform .12s ease, filter .2s ease, opacity .2s ease;
+  }
+  button:hover:not(:disabled) { filter: brightness(1.06); }
+  button:active:not(:disabled) { transform: scale(.985); }
+  button:disabled { opacity: .4; cursor: default; }
+  button:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 2px; }
+  button.ghost { background: var(--well); color: var(--text); margin-top: 12px; }
+  .rows { background: var(--well); border-radius: 14px; padding: 2px 16px; }
+  .row { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+  .row:last-child { border-bottom: 0; }
+  .row span:first-child { color: var(--muted); }
+  .row span:last-child { font-variant-numeric: tabular-nums; text-align: right; font-weight: 500; }
+  .big { font: 700 44px/1.1 -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; color: var(--accent); }
+  .muted { color: var(--muted); font-size: 14px; }
+  .label { color: var(--muted); font-size: 13px; font-weight: 500; margin: 18px 0 8px; }
+  .addr { font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace; font-size: 13px; word-break: break-all; background: var(--well); padding: 12px 14px; border-radius: 12px; }
+  .field { width: 100%; box-sizing: border-box; background: var(--well); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; color: var(--text); font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
+  .field:focus-visible { outline: 2px solid var(--accent); }
+  .field.bad { border-color: var(--err); }
+  .hint { font-size: 13px; margin: 8px 0 0; }
+  .hint.warn { color: var(--err); }
+  .msg { padding: 12px 14px; border-radius: 14px; font-size: 14px; margin-top: 14px; }
+  .msg.err { background: color-mix(in srgb, var(--err) 14%, transparent); color: var(--err); }
+  .msg.ok { background: color-mix(in srgb, var(--ok) 14%, transparent); color: var(--ok); }
+  .msg a { color: inherit; font-weight: 600; }
+  /* iOS-переключатель */
+  label.check { display: flex; gap: 14px; align-items: flex-start; justify-content: space-between; font-size: 14px; color: var(--muted); margin: 18px 0 4px; cursor: pointer; }
+  label.check input { appearance: none; -webkit-appearance: none; flex: none; width: 51px; height: 31px; border-radius: 31px; background: var(--track); position: relative; cursor: pointer; transition: background .25s; margin: 0; order: 2; }
+  label.check input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 3px 8px rgba(0, 0, 0, .25); transition: transform .25s cubic-bezier(.3, .7, .4, 1); }
+  label.check input:checked { background: var(--accent); }
+  label.check input:checked::after { transform: translateX(20px); }
+  label.check strong { display: block; color: var(--text); font-size: 15px; font-weight: 500; margin-bottom: 2px; }
+  label.check.danger input:checked { background: var(--err); }
+  label.check.danger strong { color: var(--err); }
+  /* Сегментированный контрол */
+  .rates { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 2px; background: var(--well); border-radius: 12px; }
+  .rates button { background: transparent; color: var(--text); border-radius: 10px; padding: 8px 4px; font-weight: 600; font-size: 15px; line-height: 1.25; }
+  .rates button .muted { font-size: 12px; font-weight: 500; }
+  .rates button.on { background: var(--card-solid); box-shadow: 0 3px 8px rgba(0, 0, 0, .18), 0 0 0 .5px var(--line); }
+  .rates button.on .muted { color: var(--accent); }
+  .hidden { display: none; }
+  .note { font-size: 13px; color: var(--muted); margin: 16px 0 18px; }
+  ol { padding: 0; margin: 0; list-style: none; counter-reset: s; }
+  ol li { counter-increment: s; position: relative; padding: 0 0 14px 38px; font-size: 15px; color: var(--muted); }
+  ol li:last-child { padding-bottom: 0; }
+  ol li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--well); color: var(--accent); font-size: 13px; font-weight: 700; }
+  a { color: var(--accent); }
+  footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 28px; }
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Sat Rescue</p>
+  <h1>Верните свои <em>сатоши.</em></h1>
+  <p class="lead">Биткоины, застрявшие в пылевых выходах после минтов рун и инскрипций. Ключи не покидают ваш кошелёк — вы видите и подписываете транзакцию сами.</p>
+
+  <section class="card" id="step-connect">
+    <h2><span class="n">1</span>Кошелёк</h2>
+    <button id="btn-connect">Подключить UniSat</button>
+    <div id="acc" class="hidden">
+      <div class="label">Адрес</div>
+      <div class="addr" id="acc-addr"></div>
+    </div>
+    <div id="connect-msg"></div>
+  </section>
+
+  <section class="card hidden" id="step-scan">
+    <h2><span class="n">2</span>Что нашлось</h2>
+    <div class="rows">
+      <div class="row"><span>Пылевых выходов (≤ <span id="dust-max"></span> сат)</span><span id="s-count"></span></div>
+      <div class="row"><span>Из них с инскрипциями</span><span id="s-insc"></span></div>
+      <div class="row"><span>Сатоши в пылевых выходах</span><span id="s-sats"></span></div>
+    </div>
+    <label class="check"><input type="checkbox" id="inc-insc">
+      <span><strong>Собрать инскрипции в один выход</strong>Ваши инскрипции и руны сложатся в один заблокированный выход на вашем адресе вместо многих. Сатоши под ними не освобождаются — для этого режим «Сжечь всё».</span></label>
+    <label class="check danger"><input type="checkbox" id="burn">
+      <span><strong>Сжечь всё под ноль → вывод на биржу</strong>Забрать все сатоши без остатка на внешний адрес. Руны и инскрипции бросаются навсегда. Включайте, только если на кошельке один мусор.</span></label>
+    <div id="burn-dest" class="hidden">
+      <div class="label">Адрес получателя</div>
+      <input id="dest-addr" class="field" placeholder="bc1q… — биржа или обычный кошелёк" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <p class="hint warn">Адрес биржи (Binance, OKX…) или простого кошелька (Electrum, Ledger). На UniSat или Xverse руны снова заблокируются.</p>
+    </div>
+    <div class="label">Комиссия сети, сат/vB</div>
+    <div class="rates" id="rates"></div>
+  </section>
+
+  <section class="card hidden" id="step-quote">
+    <h2><span class="n">3</span>Вы получите</h2>
+    <div class="big" id="q-clean"></div>
+    <div class="muted" id="q-usd" style="margin:4px 0 18px"></div>
+    <div class="rows">
+      <div class="row"><span>Всего в пылевых выходах</span><span id="q-total"></span></div>
+      <div class="row"><span>Комиссия сети · <span id="q-vb"></span> vB</span><span id="q-miner"></span></div>
+      <div class="row"><span id="q-junk-label">Выход для рун и инскрипций (ваш)</span><span id="q-junk"></span></div>
+      <div class="row"><span>Комиссия сервиса · <span id="q-pct"></span>%</span><span id="q-svc"></span></div>
+    </div>
+    <p class="note" id="flow-note"></p>
+    <button id="btn-sign">Подписать и отправить</button>
+    <div id="sign-msg"></div>
+  </section>
+
+  <section class="card hidden" id="step-ref">
+    <h2 class="plain">Партнёрская ссылка</h2>
+    <p class="muted" style="margin: 0 0 14px">Делитесь ссылкой — получаете <span id="ref-pct"></span>% нашей комиссии с каждого, кто вернёт сатоши по ней. Выплата приходит прямо в транзакции, на ваш адрес.</p>
+    <div class="addr" id="ref-link"></div>
+    <button class="ghost" id="ref-copy">Скопировать ссылку</button>
+  </section>
+
+  <section class="card">
+    <h2 class="plain">Как это работает</h2>
+    <ol>
+      <li>Каждый минт руны или инскрипции оставляет на кошельке выход ~546 сатоши. Кошельки блокируют их, чтобы вы случайно не потратили инскрипцию.</li>
+      <li>Пока комиссии в сети низкие, такие выходы выгодно объединить: каждый стоит ~10–15 сатоши комиссии.</li>
+      <li>Сайт собирает одну транзакцию: выходы с инскрипциями идут первыми, поэтому инскрипции и руны попадают в отдельный выход на вашем адресе, а остальное — чистыми сатоши.</li>
+      <li>Транзакцию подписывает ваш кошелёк. Сайт не видит ключей и не может отправить ничего без вашего подтверждения.</li>
+    </ol>
+  </section>
+  <footer>Транзакцию подписывает ваш кошелёк. Сайт не хранит и не видит ключей.</footer>
+</main>
+
+<script type="module">
+import { btc, hex } from './lib.js';
+
+// ---- Настройки сервиса ----
+const CONFIG = {
+  FEE_ADDRESS: 'bc1qhn047jlj79zwrtk6h54eeyqn9czprghnkdm3m9', // куда идёт комиссия сервиса
+  FEE_PERCENT: 17,          // процент от чистых сатоши
+  REF_PERCENT: 30,          // доля партнёра от комиссии сервиса (из неё, не сверху — клиент платит столько же)
+  DUST_MAX: 3000,           // какие выходы считаем пылевыми, сат (3000 добирает и выходы с рунами ~1638/2184)
+  MAX_INPUTS: 1000,         // лимит стандартной транзакции ~100 kvB
+  MIN_FEE_RATE: 0.2,        // сат/vB; ниже узлы не пропускают
+  ANALYTICS: '',            // адрес счётчика (counter.js), напр. 'https://stats.твойдомен.com'; пусто = выключено
+};
+
+// Анонимный счётчик: шлёт только название события, без адресов и данных. Пусто в CONFIG.ANALYTICS — ничего не шлётся.
+const track = (e) => {
+  if (!CONFIG.ANALYTICS) return;
+  const u = `${CONFIG.ANALYTICS}/hit?e=${e}`;
+  try { if (!navigator.sendBeacon?.(u)) fetch(u, { mode: 'no-cors', keepalive: true }); } catch {}
+};
+const API = 'https://blockstream.info/api';
+const DUST_OUT = 546n;
+// Партнёрская ссылка: ?ref=<btc-адрес>. Доля партнёра берётся из комиссии сервиса.
+const REF = (() => { const v = new URLSearchParams(location.search).get('ref'); if (!v) return null; try { btc.Address(btc.NETWORK).decode(v); return v; } catch { return null; } })();
+// Приблизительный вес входа по типу адреса, vB
+const IN_VB = { wpkh: 68, tr: 57.5, sh: 91, pkh: 148 };
+
+const $ = (id) => document.getElementById(id);
+const st = { wallet: null, address: null, kind: null, pay: null, utxos: [], inscribed: new Set(), rate: null, btcUsd: null, quote: null };
+const fmtSat = (n) => `${Number(n).toLocaleString('ru-RU')} сат`;
+const show = (id, on = true) => $(id).classList.toggle('hidden', !on);
+const msg = (id, text, kind = 'err') => { $(id).innerHTML = text ? `<div class="msg ${kind}">${text}</div>` : ''; };
+$('dust-max').textContent = CONFIG.DUST_MAX;
+$('q-pct').textContent = CONFIG.FEE_PERCENT;
+track('view');
+
+async function get(path, text) {
+  for (let i = 0; i < 4; i++) {
+    try { const r = await fetch(API + path); if (r.ok) return text ? r.text() : r.json(); } catch {}
+    await new Promise((s) => setTimeout(s, 1000 * (i + 1)));
+  }
+  throw new Error('Сервер блокчейна не отвечает, попробуйте позже');
+}
+
+// Курс BTC/USD с запасными источниками (CoinGecko из браузера часто режут)
+async function btcPrice() {
+  const tries = [
+    ['https://mempool.space/api/v1/prices', (j) => j.USD],
+    ['https://api.coinbase.com/v2/prices/BTC-USD/spot', (j) => Number(j.data?.amount)],
+    ['https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd', (j) => j.bitcoin?.usd],
+  ];
+  for (const [url, pick] of tries) {
+    try { const v = pick(await (await fetch(url, { signal: AbortSignal.timeout(8000) })).json()); if (v > 0) return v; } catch {}
+  }
+  return null;
+}
+
+// Как тратить выходы этого адреса: скрипт, redeem/taproot-ключ — по публичному ключу из кошелька
+function spendInfo(address, pubHex) {
+  const pub = hex.decode(pubHex);
+  const dec = btc.Address(btc.NETWORK).decode(address);
+  const check = (p) => { if (p.address !== address) throw new Error('Публичный ключ не соответствует адресу'); return p; };
+  if (dec.type === 'wpkh') return { kind: 'wpkh', pay: check(btc.p2wpkh(pub)) };
+  if (dec.type === 'tr') return { kind: 'tr', pay: check(btc.p2tr(pub.length === 33 ? pub.slice(1) : pub)) };
+  if (dec.type === 'sh') return { kind: 'sh', pay: check(btc.p2sh(btc.p2wpkh(pub))) };
+  if (dec.type === 'pkh') return { kind: 'pkh', pay: check(btc.p2pkh(pub)) };
+  throw new Error('Этот тип адреса не поддерживается');
+}
+
+async function loadInscribed(w) {
+  const set = new Set();
+  for (let cursor = 0; ; cursor += 100) {
+    const r = await w.getInscriptions(cursor, 100);
+    for (const i of r.list || []) set.add(i.output);
+    if (!r.list?.length || cursor + 100 >= r.total) return set;
+  }
+}
+
+$('btn-connect').onclick = async () => {
+  msg('connect-msg', '');
+  const w = window.unisat;
+  if (!w) return msg('connect-msg', 'Расширение UniSat не найдено. Установите его и обновите страницу.');
+  try {
+    $('btn-connect').disabled = true;
+    $('btn-connect').textContent = 'Подключаю…';
+    if ((await w.getNetwork()) !== 'livenet') throw new Error('Переключите UniSat на основную сеть Bitcoin (mainnet)');
+    const [address] = await w.requestAccounts();
+    const pub = await w.getPublicKey();
+    Object.assign(st, { wallet: w }, { address }, spendInfo(address, pub));
+    $('acc-addr').textContent = address;
+    show('acc');
+    $('btn-connect').textContent = 'Сканирую выходы…';
+    const [utxos, inscribed, fees, price] = await Promise.all([
+      get(`/address/${address}/utxo`), loadInscribed(w), get('/fee-estimates'), btcPrice(),
+    ]);
+    st.allUtxos = utxos.filter((u) => u.status.confirmed);
+    st.utxos = st.allUtxos.filter((u) => u.value <= CONFIG.DUST_MAX);
+    st.inscribed = inscribed;
+    st.btcUsd = price;
+    const r = (x) => Math.max(CONFIG.MIN_FEE_RATE, Math.ceil((x || CONFIG.MIN_FEE_RATE) * 10) / 10);
+    const opts = [...new Set([r(fees['144']), r(fees['6']), r(fees['1'])])];
+    $('rates').innerHTML = opts.map((v, i) => `<button data-r="${v}">${v}<br><span class="muted">${['медленно', 'обычно', 'быстро'][i + 3 - opts.length]}</span></button>`).join('');
+    $('rates').querySelectorAll('button').forEach((b) => (b.onclick = () => { st.rate = Number(b.dataset.r); render(); }));
+    st.rate = opts[0];
+    $('btn-connect').textContent = 'Подключено';
+    track('connect');
+    $('ref-pct').textContent = CONFIG.REF_PERCENT;
+    $('ref-link').textContent = `${location.origin}${location.pathname}?ref=${address}`;
+    show('step-ref');
+    show('step-scan');
+    render();
+  } catch (e) {
+    $('btn-connect').disabled = false;
+    $('btn-connect').textContent = 'Подключить UniSat';
+    msg('connect-msg', e.message || String(e));
+  }
+};
+$('inc-insc').onchange = () => render();
+$('burn').onchange = () => render();
+$('dest-addr').oninput = () => render();
+$('ref-copy').onclick = async () => {
+  try { await navigator.clipboard.writeText($('ref-link').textContent); $('ref-copy').textContent = 'Скопировано ✓'; setTimeout(() => ($('ref-copy').textContent = 'Скопировать ссылку'), 1500); } catch {}
+};
+window.unisat?.on?.('accountsChanged', () => location.reload());
+
+// Внешний адрес получателя для burn-режима; null, если пусто или невалиден
+function destAddr() {
+  const v = ($('dest-addr').value || '').trim();
+  if (!v) return null;
+  try { btc.Address(btc.NETWORK).decode(v); return v; } catch { return null; }
+}
+
+function quote() {
+  const burn = $('burn').checked;
+  // Обычный режим: чистые сатоши остаются в подключённом кошельке. Burn: уходят на внешний адрес.
+  const dest = burn ? destAddr() : st.address;
+  const isIns = (u) => st.inscribed.has(`${u.txid}:${u.vout}`);
+  let inputs, junk;
+  if (burn) {
+    // Инскрипции первыми: их сатоши лягут в первый (чистый) выход на внешний адрес, а не в комиссию/партнёру
+    inputs = [...st.allUtxos.filter(isIns), ...st.allUtxos.filter((u) => !isIns(u))].slice(0, CONFIG.MAX_INPUTS);
+    junk = 0n;
+  } else {
+    const ins = $('inc-insc').checked ? st.utxos.filter(isIns) : [];
+    inputs = [...ins, ...st.utxos.filter((u) => !isIns(u))].slice(0, CONFIG.MAX_INPUTS);
+    // Мусорный выход держит ВСЕ инскрипции (и руны) одним куском, чтобы чистый выход и комиссия были без ординалов
+    junk = ins.length ? ins.reduce((a, u) => a + BigInt(u.value), 0n) : DUST_OUT;
+  }
+  const total = inputs.reduce((a, u) => a + BigInt(u.value), 0n);
+  const outVb = (a) => 9 + btc.OutScript.encode(btc.Address(btc.NETWORK).decode(a)).length;
+  // выходы: мусорный (только обычный режим, на свой адрес) + чистый (на dest) + комиссия сервиса
+  const hasRef = REF && REF !== st.address && REF !== CONFIG.FEE_ADDRESS;
+  const vb = Math.ceil(10.5 + inputs.length * IN_VB[st.kind] + (junk > 0n ? outVb(st.address) : 0) + outVb(dest || st.address) + outVb(CONFIG.FEE_ADDRESS) + (hasRef ? outVb(REF) : 0));
+  const miner = BigInt(Math.ceil(vb * st.rate));
+  const net = total - junk - miner;
+  let svc = (net * BigInt(CONFIG.FEE_PERCENT)) / 100n;
+  if (svc < DUST_OUT) svc = 0n; // слишком мало для отдельного выхода
+  // Доля партнёра из комиссии сервиса, только если обе части не меньше пыли
+  let svcRef = 0n, svcOp = svc;
+  if (hasRef && svc > 0n) {
+    const r = (svc * BigInt(CONFIG.REF_PERCENT)) / 100n;
+    if (r >= DUST_OUT && svc - r >= DUST_OUT) { svcRef = r; svcOp = svc - r; }
+  }
+  const clean = net - svc;
+  return { inputs, total, junk, vb, miner, svc, svcOp, svcRef, clean, burn, dest, ok: inputs.length >= 1 && clean >= DUST_OUT && !!dest };
+}
+
+function render() {
+  const burn = $('burn').checked;
+  $('inc-insc').disabled = burn; // в режиме сжигания галка инскрипций не нужна
+  show('burn-dest', burn);
+  const raw = ($('dest-addr').value || '').trim();
+  $('dest-addr').classList.toggle('bad', burn && raw !== '' && !destAddr());
+  const set = burn ? st.allUtxos : st.utxos;
+  $('s-count').textContent = set.length;
+  $('s-insc').textContent = set.filter((u) => st.inscribed.has(`${u.txid}:${u.vout}`)).length;
+  $('s-sats').textContent = fmtSat(set.reduce((a, u) => a + u.value, 0));
+  $('rates').querySelectorAll('button').forEach((b) => b.classList.toggle('on', Number(b.dataset.r) === st.rate));
+  const q = (st.quote = quote());
+  show('step-quote');
+  $('q-total').textContent = `${fmtSat(q.total)} · ${q.inputs.length} вых.`;
+  $('q-vb').textContent = q.vb.toLocaleString('ru-RU');
+  $('q-miner').textContent = fmtSat(q.miner);
+  $('q-junk-label').textContent = burn ? 'Руны и инскрипции' : 'Выход для рун и инскрипций (ваш)';
+  $('q-junk').textContent = burn ? 'сгорят' : fmtSat(q.junk);
+  $('q-svc').textContent = fmtSat(q.svc);
+  $('q-clean').textContent = q.ok ? fmtSat(q.clean) : '—';
+  $('flow-note').textContent = burn
+    ? 'Все сатоши уйдут одним выходом на внешний адрес. Руны и инскрипции не сохраняются.'
+    : 'Руны остаются в вашем кошельке отдельным выходом. Чистые сатоши придут обычным выходом — кошелёк покажет их как доступный BTC.';
+  const note = burn && !destAddr()
+    ? 'Укажите внешний адрес получателя (биржа или обычный кошелёк)'
+    : 'Нечего возвращать: выходов слишком мало или комиссия съедает всё';
+  $('q-usd').textContent = q.ok && st.btcUsd ? `≈ $${((Number(q.clean) / 1e8) * st.btcUsd).toFixed(2)}` : (q.ok ? '' : note);
+  $('btn-sign').disabled = !q.ok;
+}
+
+$('btn-sign').onclick = async () => {
+  msg('sign-msg', '');
+  const q = st.quote;
+  try {
+    $('btn-sign').disabled = true;
+    $('btn-sign').textContent = 'Собираю транзакцию…';
+    const tx = new btc.Transaction();
+    for (const u of q.inputs) {
+      const base = { txid: u.txid, index: u.vout };
+      if (st.kind === 'pkh') tx.addInput({ ...base, nonWitnessUtxo: hex.decode(await get(`/tx/${u.txid}/hex`, true)) });
+      else tx.addInput({ ...base, witnessUtxo: { script: st.pay.script, amount: BigInt(u.value) }, redeemScript: st.pay.redeemScript, tapInternalKey: st.pay.tapInternalKey });
+    }
+    if (q.junk > 0n) tx.addOutputAddress(st.address, q.junk, btc.NETWORK); // руны остаются в подключённом кошельке
+    tx.addOutputAddress(q.dest, q.clean, btc.NETWORK);                      // чистые сатоши: свой кошелёк или внешний адрес
+    if (q.svcOp > 0n) tx.addOutputAddress(CONFIG.FEE_ADDRESS, q.svcOp, btc.NETWORK); // комиссия сервиса
+    if (q.svcRef > 0n) tx.addOutputAddress(REF, q.svcRef, btc.NETWORK);              // доля партнёра
+    $('btn-sign').textContent = 'Подтвердите в UniSat…';
+    const signed = await st.wallet.signPsbt(hex.encode(tx.toPSBT()), { autoFinalized: true });
+    $('btn-sign').textContent = 'Отправляю…';
+    const txid = await st.wallet.pushPsbt(signed);
+    track('sign');
+    $('btn-sign').textContent = 'Готово';
+    msg('sign-msg', `Отправлено: <a href="https://mempool.space/tx/${txid}" target="_blank" rel="noopener">${txid.slice(0, 10)}…${txid.slice(-6)}</a>. Сатоши станут доступны после подтверждения.`, 'ok');
+  } catch (e) {
+    $('btn-sign').disabled = false;
+    $('btn-sign').textContent = 'Подписать и отправить';
+    msg('sign-msg', e.message || String(e));
+  }
+};
+</script>
+</body>
+</html>
