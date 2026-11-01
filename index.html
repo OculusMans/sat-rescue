@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -103,76 +103,81 @@
   ol li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--well); color: var(--accent); font-size: 13px; font-weight: 700; }
   a { color: var(--accent); }
   footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 28px; }
+  /* Переключатель языка */
+  .lang { position: fixed; top: 14px; right: 14px; display: flex; gap: 2px; padding: 3px; background: var(--well); border: 1px solid var(--line); border-radius: 980px; z-index: 10; }
+  .lang button { width: auto; padding: 5px 11px; border-radius: 980px; background: transparent; color: var(--muted); font-size: 13px; font-weight: 600; }
+  .lang button.on { background: var(--card-solid); color: var(--text); box-shadow: 0 1px 3px rgba(0, 0, 0, .2); }
 </style>
 </head>
 <body>
+<div class="lang" id="lang"><button data-l="en">EN</button><button data-l="ru">RU</button></div>
 <main>
   <p class="eyebrow">Sat Rescue</p>
-  <h1>Верните свои <em>сатоши.</em></h1>
-  <p class="lead">Биткоины, застрявшие в пылевых выходах после минтов рун и инскрипций. Ключи не покидают ваш кошелёк — вы видите и подписываете транзакцию сами.</p>
+  <h1 id="h1"></h1>
+  <p class="lead" id="lead"></p>
 
   <section class="card" id="step-connect">
-    <h2><span class="n">1</span>Кошелёк</h2>
-    <button id="btn-connect">Подключить UniSat</button>
+    <h2><span class="n">1</span><span id="t-wallet"></span></h2>
+    <button id="btn-connect"></button>
     <div id="acc" class="hidden">
-      <div class="label">Адрес</div>
+      <div class="label" id="t-address"></div>
       <div class="addr" id="acc-addr"></div>
     </div>
     <div id="connect-msg"></div>
   </section>
 
   <section class="card hidden" id="step-scan">
-    <h2><span class="n">2</span>Что нашлось</h2>
+    <h2><span class="n">2</span><span id="t-found"></span></h2>
     <div class="rows">
-      <div class="row"><span>Пылевых выходов (≤ <span id="dust-max"></span> сат)</span><span id="s-count"></span></div>
-      <div class="row"><span>Из них с инскрипциями</span><span id="s-insc"></span></div>
-      <div class="row"><span>Сатоши в пылевых выходах</span><span id="s-sats"></span></div>
+      <div class="row"><span id="l-count"></span><span id="s-count"></span></div>
+      <div class="row"><span id="l-insc"></span><span id="s-insc"></span></div>
+      <div class="row"><span id="l-sats"></span><span id="s-sats"></span></div>
     </div>
     <label class="check"><input type="checkbox" id="inc-insc">
-      <span><strong>Собрать инскрипции в один выход</strong>Ваши инскрипции и руны сложатся в один заблокированный выход на вашем адресе вместо многих. Сатоши под ними не освобождаются — для этого режим «Сжечь всё».</span></label>
+      <span><strong id="t-inc-h"></strong><span id="t-inc-d"></span></span></label>
     <label class="check danger"><input type="checkbox" id="burn">
-      <span><strong>Сжечь всё под ноль → вывод на биржу</strong>Забрать все сатоши без остатка на внешний адрес. Руны и инскрипции бросаются навсегда. Включайте, только если на кошельке один мусор.</span></label>
+      <span><strong id="t-burn-h"></strong><span id="t-burn-d"></span></span></label>
     <div id="burn-dest" class="hidden">
-      <div class="label">Адрес получателя</div>
-      <input id="dest-addr" class="field" placeholder="bc1q… — биржа или обычный кошелёк" autocomplete="off" autocapitalize="off" spellcheck="false">
-      <p class="hint warn">Адрес биржи (Binance, OKX…) или простого кошелька (Electrum, Ledger). На UniSat или Xverse руны снова заблокируются.</p>
+      <div class="label" id="t-dest"></div>
+      <input id="dest-addr" class="field" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <p class="hint warn" id="t-dest-hint"></p>
     </div>
-    <div class="label">Комиссия сети, сат/vB</div>
+    <div class="label" id="t-netrate"></div>
     <div class="rates" id="rates"></div>
   </section>
 
   <section class="card hidden" id="step-quote">
-    <h2><span class="n">3</span>Вы получите</h2>
+    <h2><span class="n">3</span><span id="t-receive"></span></h2>
     <div class="big" id="q-clean"></div>
     <div class="muted" id="q-usd" style="margin:4px 0 18px"></div>
     <div class="rows">
-      <div class="row"><span>Всего в пылевых выходах</span><span id="q-total"></span></div>
-      <div class="row"><span>Комиссия сети · <span id="q-vb"></span> vB</span><span id="q-miner"></span></div>
-      <div class="row"><span id="q-junk-label">Выход для рун и инскрипций (ваш)</span><span id="q-junk"></span></div>
-      <div class="row"><span>Комиссия сервиса · <span id="q-pct"></span>%</span><span id="q-svc"></span></div>
+      <div class="row"><span id="l-total"></span><span id="q-total"></span></div>
+      <div class="row"><span><span id="l-miner"></span> · <span id="q-vb"></span> vB</span><span id="q-miner"></span></div>
+      <div class="row"><span id="q-junk-label"></span><span id="q-junk"></span></div>
+      <div class="row"><span><span id="l-svc"></span> · <span id="q-pct"></span>%</span><span id="q-svc"></span></div>
     </div>
     <p class="note" id="flow-note"></p>
-    <button id="btn-sign">Подписать и отправить</button>
+    <button id="btn-sign"></button>
     <div id="sign-msg"></div>
   </section>
 
   <section class="card hidden" id="step-ref">
-    <h2 class="plain">Партнёрская ссылка</h2>
-    <p class="muted" style="margin: 0 0 14px">Делитесь ссылкой — получаете <span id="ref-pct"></span>% нашей комиссии с каждого, кто вернёт сатоши по ней. Выплата приходит прямо в транзакции, на ваш адрес.</p>
+    <h2 class="plain" id="t-ref"></h2>
+    <p class="muted" style="margin: 0 0 14px"><span id="t-ref-pre"></span><span id="ref-pct"></span><span id="t-ref-post"></span></p>
     <div class="addr" id="ref-link"></div>
-    <button class="ghost" id="ref-copy">Скопировать ссылку</button>
+    <button class="ghost" id="ref-copy"></button>
   </section>
 
   <section class="card">
-    <h2 class="plain">Как это работает</h2>
+    <h2 class="plain" id="t-how"></h2>
     <ol>
-      <li>Каждый минт руны или инскрипции оставляет на кошельке выход ~546 сатоши. Кошельки блокируют их, чтобы вы случайно не потратили инскрипцию.</li>
-      <li>Пока комиссии в сети низкие, такие выходы выгодно объединить: каждый стоит ~10–15 сатоши комиссии.</li>
-      <li>Сайт собирает одну транзакцию: выходы с инскрипциями идут первыми, поэтому инскрипции и руны попадают в отдельный выход на вашем адресе, а остальное — чистыми сатоши.</li>
-      <li>Транзакцию подписывает ваш кошелёк. Сайт не видит ключей и не может отправить ничего без вашего подтверждения.</li>
+      <li id="t-how1"></li>
+      <li id="t-how2"></li>
+      <li id="t-how3"></li>
+      <li id="t-how4"></li>
     </ol>
   </section>
-  <footer>Транзакцию подписывает ваш кошелёк. Сайт не хранит и не видит ключей.</footer>
+  <footer id="t-footer"></footer>
 </main>
 
 <script type="module">
@@ -189,6 +194,84 @@ const CONFIG = {
   ANALYTICS: '',            // адрес счётчика (counter.js), напр. 'https://stats.твойдомен.com'; пусто = выключено
 };
 
+// ---- Локализация: английский по умолчанию, переключение на русский ----
+const I18N = {
+  en: {
+    h1: 'Get your <em>sats</em> back.',
+    lead: 'Bitcoin stuck in dust outputs left by rune and inscription mints. Your keys never leave your wallet; you review and sign the transaction yourself.',
+    wallet: 'Wallet', connect: 'Connect UniSat', connecting: 'Connecting…', scanning: 'Scanning outputs…', connected: 'Connected',
+    address: 'Address', found: 'What we found',
+    row_dust: 'Dust outputs (≤ {n} sat)', row_insc: 'Of those, with inscriptions', row_sats: 'Sats in dust outputs',
+    inc_h: 'Collect inscriptions into one output',
+    inc_d: 'Your inscriptions and runes get packed into a single locked output on your address instead of many. The sats under them are not freed; use Burn mode for that.',
+    burn_h: 'Burn everything to zero → send to exchange',
+    burn_d: 'Take every sat to an external address. Runes and inscriptions are given up for good. Only turn this on if the wallet holds nothing but junk.',
+    dest_label: 'Recipient address', dest_ph: 'bc1q… exchange or plain wallet',
+    dest_hint: 'An exchange address (Binance, OKX…) or a plain wallet (Electrum, Ledger). In UniSat or Xverse the runes get locked again.',
+    netrate: 'Network fee, sat/vB', receive: 'You receive', total: 'Total in dust outputs', net_fee: 'Network fee', service_fee: 'Service fee',
+    junk_burn: 'Runes and inscriptions', junk_normal: 'Output for runes and inscriptions (yours)', burned: 'burned',
+    flow_burn: 'All sats go out in a single output to the external address. Runes and inscriptions are not kept.',
+    flow_normal: 'Runes stay in your wallet as a separate output. The clean sats arrive as a normal output; your wallet shows them as spendable BTC.',
+    note_dest: 'Enter an external recipient address (exchange or plain wallet)',
+    note_none: 'Nothing to recover: too few outputs or the fee eats it all',
+    sign: 'Sign and send', signing_build: 'Building transaction…', signing_confirm: 'Confirm in UniSat…', signing_send: 'Sending…', done: 'Done',
+    sent_pre: 'Sent: ', sent_post: '. The sats become available after confirmation.',
+    ref_title: 'Referral link', ref_pre: 'Share your link and get ', ref_post: '% of our fee from everyone who recovers sats through it. The payout comes straight in the transaction, to your address.',
+    copy: 'Copy link', copied: 'Copied ✓',
+    how: 'How it works',
+    how1: 'Every rune or inscription mint leaves a ~546 sat output in your wallet. Wallets lock these so you don’t accidentally spend an inscription.',
+    how2: 'While network fees are low, it pays to consolidate these outputs: each one costs about 10–15 sats in fees.',
+    how3: 'The site builds one transaction: inscription outputs go first, so inscriptions and runes land in a separate output on your address, and the rest comes as plain sats.',
+    how4: 'Your wallet signs the transaction. The site never sees your keys and can’t send anything without your confirmation.',
+    footer: 'Your wallet signs the transaction. The site never stores or sees your keys.',
+    sat: 'sat', out: 'out.', slow: 'slow', normal: 'normal', fast: 'fast',
+    err_no_unisat: 'UniSat extension not found. Install it and refresh the page.',
+    err_mainnet: 'Switch UniSat to Bitcoin mainnet.',
+    err_blockchain: 'The blockchain server isn’t responding, try again later.',
+    err_pubkey: 'Public key doesn’t match the address.',
+    err_addrtype: 'This address type is not supported.',
+  },
+  ru: {
+    h1: 'Верните свои <em>сатоши.</em>',
+    lead: 'Биткоины, застрявшие в пылевых выходах после минтов рун и инскрипций. Ключи не покидают ваш кошелёк — вы видите и подписываете транзакцию сами.',
+    wallet: 'Кошелёк', connect: 'Подключить UniSat', connecting: 'Подключаю…', scanning: 'Сканирую выходы…', connected: 'Подключено',
+    address: 'Адрес', found: 'Что нашлось',
+    row_dust: 'Пылевых выходов (≤ {n} сат)', row_insc: 'Из них с инскрипциями', row_sats: 'Сатоши в пылевых выходах',
+    inc_h: 'Собрать инскрипции в один выход',
+    inc_d: 'Ваши инскрипции и руны сложатся в один заблокированный выход на вашем адресе вместо многих. Сатоши под ними не освобождаются — для этого режим «Сжечь всё».',
+    burn_h: 'Сжечь всё под ноль → вывод на биржу',
+    burn_d: 'Забрать все сатоши без остатка на внешний адрес. Руны и инскрипции бросаются навсегда. Включайте, только если на кошельке один мусор.',
+    dest_label: 'Адрес получателя', dest_ph: 'bc1q… — биржа или обычный кошелёк',
+    dest_hint: 'Адрес биржи (Binance, OKX…) или простого кошелька (Electrum, Ledger). На UniSat или Xverse руны снова заблокируются.',
+    netrate: 'Комиссия сети, сат/vB', receive: 'Вы получите', total: 'Всего в пылевых выходах', net_fee: 'Комиссия сети', service_fee: 'Комиссия сервиса',
+    junk_burn: 'Руны и инскрипции', junk_normal: 'Выход для рун и инскрипций (ваш)', burned: 'сгорят',
+    flow_burn: 'Все сатоши уйдут одним выходом на внешний адрес. Руны и инскрипции не сохраняются.',
+    flow_normal: 'Руны остаются в вашем кошельке отдельным выходом. Чистые сатоши придут обычным выходом — кошелёк покажет их как доступный BTC.',
+    note_dest: 'Укажите внешний адрес получателя (биржа или обычный кошелёк)',
+    note_none: 'Нечего возвращать: выходов слишком мало или комиссия съедает всё',
+    sign: 'Подписать и отправить', signing_build: 'Собираю транзакцию…', signing_confirm: 'Подтвердите в UniSat…', signing_send: 'Отправляю…', done: 'Готово',
+    sent_pre: 'Отправлено: ', sent_post: '. Сатоши станут доступны после подтверждения.',
+    ref_title: 'Партнёрская ссылка', ref_pre: 'Делитесь ссылкой — получаете ', ref_post: '% нашей комиссии с каждого, кто вернёт сатоши по ней. Выплата приходит прямо в транзакции, на ваш адрес.',
+    copy: 'Скопировать ссылку', copied: 'Скопировано ✓',
+    how: 'Как это работает',
+    how1: 'Каждый минт руны или инскрипции оставляет на кошельке выход ~546 сатоши. Кошельки блокируют их, чтобы вы случайно не потратили инскрипцию.',
+    how2: 'Пока комиссии в сети низкие, такие выходы выгодно объединить: каждый стоит ~10–15 сатоши комиссии.',
+    how3: 'Сайт собирает одну транзакцию: выходы с инскрипциями идут первыми, поэтому инскрипции и руны попадают в отдельный выход на вашем адресе, а остальное — чистыми сатоши.',
+    how4: 'Транзакцию подписывает ваш кошелёк. Сайт не видит ключей и не может отправить ничего без вашего подтверждения.',
+    footer: 'Транзакцию подписывает ваш кошелёк. Сайт не хранит и не видит ключей.',
+    sat: 'сат', out: 'вых.', slow: 'медленно', normal: 'обычно', fast: 'быстро',
+    err_no_unisat: 'Расширение UniSat не найдено. Установите его и обновите страницу.',
+    err_mainnet: 'Переключите UniSat на основную сеть Bitcoin (mainnet)',
+    err_blockchain: 'Сервер блокчейна не отвечает, попробуйте позже',
+    err_pubkey: 'Публичный ключ не соответствует адресу',
+    err_addrtype: 'Этот тип адреса не поддерживается',
+  },
+};
+let LANG = (() => { try { return localStorage.getItem('sr-lang') || 'en'; } catch { return 'en'; } })();
+if (!I18N[LANG]) LANG = 'en';
+const t = (k) => (I18N[LANG] && I18N[LANG][k] != null ? I18N[LANG][k] : I18N.en[k]);
+const LOCALE = () => (LANG === 'ru' ? 'ru-RU' : 'en-US');
+
 // Анонимный счётчик: шлёт только название события, без адресов и данных. Пусто в CONFIG.ANALYTICS — ничего не шлётся.
 const track = (e) => {
   if (!CONFIG.ANALYTICS) return;
@@ -203,20 +286,74 @@ const REF = (() => { const v = new URLSearchParams(location.search).get('ref'); 
 const IN_VB = { wpkh: 68, tr: 57.5, sh: 91, pkh: 148 };
 
 const $ = (id) => document.getElementById(id);
-const st = { wallet: null, address: null, kind: null, pay: null, utxos: [], inscribed: new Set(), rate: null, btcUsd: null, quote: null };
-const fmtSat = (n) => `${Number(n).toLocaleString('ru-RU')} сат`;
+const st = { wallet: null, address: null, kind: null, pay: null, utxos: [], allUtxos: [], inscribed: new Set(), rate: null, rateOpts: null, btcUsd: null, quote: null, connected: false };
+const fmtSat = (n) => `${Number(n).toLocaleString(LOCALE())} ${t('sat')}`;
 const show = (id, on = true) => $(id).classList.toggle('hidden', !on);
 const msg = (id, text, kind = 'err') => { $(id).innerHTML = text ? `<div class="msg ${kind}">${text}</div>` : ''; };
-$('dust-max').textContent = CONFIG.DUST_MAX;
-$('q-pct').textContent = CONFIG.FEE_PERCENT;
-track('view');
+
+// Проставить все статичные строки интерфейса по текущему языку
+function applyStatic() {
+  document.documentElement.lang = LANG;
+  $('lang').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.l === LANG));
+  $('h1').innerHTML = t('h1');
+  $('lead').textContent = t('lead');
+  $('t-wallet').textContent = t('wallet');
+  $('btn-connect').textContent = st.connected ? t('connected') : t('connect');
+  $('t-address').textContent = t('address');
+  $('t-found').textContent = t('found');
+  $('l-count').textContent = t('row_dust').replace('{n}', Number(CONFIG.DUST_MAX).toLocaleString(LOCALE()));
+  $('l-insc').textContent = t('row_insc');
+  $('l-sats').textContent = t('row_sats');
+  $('t-inc-h').textContent = t('inc_h');
+  $('t-inc-d').textContent = t('inc_d');
+  $('t-burn-h').textContent = t('burn_h');
+  $('t-burn-d').textContent = t('burn_d');
+  $('t-dest').textContent = t('dest_label');
+  $('dest-addr').placeholder = t('dest_ph');
+  $('t-dest-hint').textContent = t('dest_hint');
+  $('t-netrate').textContent = t('netrate');
+  $('t-receive').textContent = t('receive');
+  $('l-total').textContent = t('total');
+  $('l-miner').textContent = t('net_fee');
+  $('l-svc').textContent = t('service_fee');
+  $('q-pct').textContent = CONFIG.FEE_PERCENT;
+  $('t-ref').textContent = t('ref_title');
+  $('t-ref-pre').textContent = t('ref_pre');
+  $('t-ref-post').textContent = t('ref_post');
+  $('ref-copy').textContent = t('copy');
+  $('t-how').textContent = t('how');
+  for (let i = 1; i <= 4; i++) $('t-how' + i).textContent = t('how' + i);
+  $('t-footer').textContent = t('footer');
+  $('btn-sign').textContent = t('sign');
+}
+
+// Пересобрать кнопки комиссии сети (нужно и при смене языка — у них текстовые подписи)
+function renderRates() {
+  const opts = st.rateOpts;
+  if (!opts) return;
+  const labels = [t('slow'), t('normal'), t('fast')];
+  $('rates').innerHTML = opts.map((v, i) => `<button data-r="${v}">${v}<br><span class="muted">${labels[i + 3 - opts.length]}</span></button>`).join('');
+  $('rates').querySelectorAll('button').forEach((b) => {
+    b.onclick = () => { st.rate = Number(b.dataset.r); render(); };
+    b.classList.toggle('on', Number(b.dataset.r) === st.rate);
+  });
+}
+
+function setLang(l) {
+  if (!I18N[l]) return;
+  LANG = l;
+  try { localStorage.setItem('sr-lang', l); } catch {}
+  applyStatic();
+  renderRates();
+  if (st.wallet) render();
+}
 
 async function get(path, text) {
   for (let i = 0; i < 4; i++) {
     try { const r = await fetch(API + path); if (r.ok) return text ? r.text() : r.json(); } catch {}
     await new Promise((s) => setTimeout(s, 1000 * (i + 1)));
   }
-  throw new Error('Сервер блокчейна не отвечает, попробуйте позже');
+  throw new Error(t('err_blockchain'));
 }
 
 // Курс BTC/USD с запасными источниками (CoinGecko из браузера часто режут)
@@ -236,12 +373,12 @@ async function btcPrice() {
 function spendInfo(address, pubHex) {
   const pub = hex.decode(pubHex);
   const dec = btc.Address(btc.NETWORK).decode(address);
-  const check = (p) => { if (p.address !== address) throw new Error('Публичный ключ не соответствует адресу'); return p; };
+  const check = (p) => { if (p.address !== address) throw new Error(t('err_pubkey')); return p; };
   if (dec.type === 'wpkh') return { kind: 'wpkh', pay: check(btc.p2wpkh(pub)) };
   if (dec.type === 'tr') return { kind: 'tr', pay: check(btc.p2tr(pub.length === 33 ? pub.slice(1) : pub)) };
   if (dec.type === 'sh') return { kind: 'sh', pay: check(btc.p2sh(btc.p2wpkh(pub))) };
   if (dec.type === 'pkh') return { kind: 'pkh', pay: check(btc.p2pkh(pub)) };
-  throw new Error('Этот тип адреса не поддерживается');
+  throw new Error(t('err_addrtype'));
 }
 
 async function loadInscribed(w) {
@@ -256,17 +393,17 @@ async function loadInscribed(w) {
 $('btn-connect').onclick = async () => {
   msg('connect-msg', '');
   const w = window.unisat;
-  if (!w) return msg('connect-msg', 'Расширение UniSat не найдено. Установите его и обновите страницу.');
+  if (!w) return msg('connect-msg', t('err_no_unisat'));
   try {
     $('btn-connect').disabled = true;
-    $('btn-connect').textContent = 'Подключаю…';
-    if ((await w.getNetwork()) !== 'livenet') throw new Error('Переключите UniSat на основную сеть Bitcoin (mainnet)');
+    $('btn-connect').textContent = t('connecting');
+    if ((await w.getNetwork()) !== 'livenet') throw new Error(t('err_mainnet'));
     const [address] = await w.requestAccounts();
     const pub = await w.getPublicKey();
     Object.assign(st, { wallet: w }, { address }, spendInfo(address, pub));
     $('acc-addr').textContent = address;
     show('acc');
-    $('btn-connect').textContent = 'Сканирую выходы…';
+    $('btn-connect').textContent = t('scanning');
     const [utxos, inscribed, fees, price] = await Promise.all([
       get(`/address/${address}/utxo`), loadInscribed(w), get('/fee-estimates'), btcPrice(),
     ]);
@@ -275,11 +412,11 @@ $('btn-connect').onclick = async () => {
     st.inscribed = inscribed;
     st.btcUsd = price;
     const r = (x) => Math.max(CONFIG.MIN_FEE_RATE, Math.ceil((x || CONFIG.MIN_FEE_RATE) * 10) / 10);
-    const opts = [...new Set([r(fees['144']), r(fees['6']), r(fees['1'])])];
-    $('rates').innerHTML = opts.map((v, i) => `<button data-r="${v}">${v}<br><span class="muted">${['медленно', 'обычно', 'быстро'][i + 3 - opts.length]}</span></button>`).join('');
-    $('rates').querySelectorAll('button').forEach((b) => (b.onclick = () => { st.rate = Number(b.dataset.r); render(); }));
-    st.rate = opts[0];
-    $('btn-connect').textContent = 'Подключено';
+    st.rateOpts = [...new Set([r(fees['144']), r(fees['6']), r(fees['1'])])];
+    st.rate = st.rateOpts[0];
+    renderRates();
+    st.connected = true;
+    $('btn-connect').textContent = t('connected');
     track('connect');
     $('ref-pct').textContent = CONFIG.REF_PERCENT;
     $('ref-link').textContent = `${location.origin}${location.pathname}?ref=${address}`;
@@ -288,7 +425,7 @@ $('btn-connect').onclick = async () => {
     render();
   } catch (e) {
     $('btn-connect').disabled = false;
-    $('btn-connect').textContent = 'Подключить UniSat';
+    $('btn-connect').textContent = t('connect');
     msg('connect-msg', e.message || String(e));
   }
 };
@@ -296,8 +433,9 @@ $('inc-insc').onchange = () => render();
 $('burn').onchange = () => render();
 $('dest-addr').oninput = () => render();
 $('ref-copy').onclick = async () => {
-  try { await navigator.clipboard.writeText($('ref-link').textContent); $('ref-copy').textContent = 'Скопировано ✓'; setTimeout(() => ($('ref-copy').textContent = 'Скопировать ссылку'), 1500); } catch {}
+  try { await navigator.clipboard.writeText($('ref-link').textContent); $('ref-copy').textContent = t('copied'); setTimeout(() => ($('ref-copy').textContent = t('copy')), 1500); } catch {}
 };
+$('lang').querySelectorAll('button').forEach((b) => (b.onclick = () => setLang(b.dataset.l)));
 window.unisat?.on?.('accountsChanged', () => location.reload());
 
 // Внешний адрес получателя для burn-режима; null, если пусто или невалиден
@@ -355,19 +493,15 @@ function render() {
   $('rates').querySelectorAll('button').forEach((b) => b.classList.toggle('on', Number(b.dataset.r) === st.rate));
   const q = (st.quote = quote());
   show('step-quote');
-  $('q-total').textContent = `${fmtSat(q.total)} · ${q.inputs.length} вых.`;
-  $('q-vb').textContent = q.vb.toLocaleString('ru-RU');
+  $('q-total').textContent = `${fmtSat(q.total)} · ${q.inputs.length} ${t('out')}`;
+  $('q-vb').textContent = q.vb.toLocaleString(LOCALE());
   $('q-miner').textContent = fmtSat(q.miner);
-  $('q-junk-label').textContent = burn ? 'Руны и инскрипции' : 'Выход для рун и инскрипций (ваш)';
-  $('q-junk').textContent = burn ? 'сгорят' : fmtSat(q.junk);
+  $('q-junk-label').textContent = burn ? t('junk_burn') : t('junk_normal');
+  $('q-junk').textContent = burn ? t('burned') : fmtSat(q.junk);
   $('q-svc').textContent = fmtSat(q.svc);
   $('q-clean').textContent = q.ok ? fmtSat(q.clean) : '—';
-  $('flow-note').textContent = burn
-    ? 'Все сатоши уйдут одним выходом на внешний адрес. Руны и инскрипции не сохраняются.'
-    : 'Руны остаются в вашем кошельке отдельным выходом. Чистые сатоши придут обычным выходом — кошелёк покажет их как доступный BTC.';
-  const note = burn && !destAddr()
-    ? 'Укажите внешний адрес получателя (биржа или обычный кошелёк)'
-    : 'Нечего возвращать: выходов слишком мало или комиссия съедает всё';
+  $('flow-note').textContent = burn ? t('flow_burn') : t('flow_normal');
+  const note = burn && !destAddr() ? t('note_dest') : t('note_none');
   $('q-usd').textContent = q.ok && st.btcUsd ? `≈ $${((Number(q.clean) / 1e8) * st.btcUsd).toFixed(2)}` : (q.ok ? '' : note);
   $('btn-sign').disabled = !q.ok;
 }
@@ -377,7 +511,7 @@ $('btn-sign').onclick = async () => {
   const q = st.quote;
   try {
     $('btn-sign').disabled = true;
-    $('btn-sign').textContent = 'Собираю транзакцию…';
+    $('btn-sign').textContent = t('signing_build');
     const tx = new btc.Transaction();
     for (const u of q.inputs) {
       const base = { txid: u.txid, index: u.vout };
@@ -388,19 +522,22 @@ $('btn-sign').onclick = async () => {
     tx.addOutputAddress(q.dest, q.clean, btc.NETWORK);                      // чистые сатоши: свой кошелёк или внешний адрес
     if (q.svcOp > 0n) tx.addOutputAddress(CONFIG.FEE_ADDRESS, q.svcOp, btc.NETWORK); // комиссия сервиса
     if (q.svcRef > 0n) tx.addOutputAddress(REF, q.svcRef, btc.NETWORK);              // доля партнёра
-    $('btn-sign').textContent = 'Подтвердите в UniSat…';
+    $('btn-sign').textContent = t('signing_confirm');
     const signed = await st.wallet.signPsbt(hex.encode(tx.toPSBT()), { autoFinalized: true });
-    $('btn-sign').textContent = 'Отправляю…';
+    $('btn-sign').textContent = t('signing_send');
     const txid = await st.wallet.pushPsbt(signed);
     track('sign');
-    $('btn-sign').textContent = 'Готово';
-    msg('sign-msg', `Отправлено: <a href="https://mempool.space/tx/${txid}" target="_blank" rel="noopener">${txid.slice(0, 10)}…${txid.slice(-6)}</a>. Сатоши станут доступны после подтверждения.`, 'ok');
+    $('btn-sign').textContent = t('done');
+    msg('sign-msg', `${t('sent_pre')}<a href="https://mempool.space/tx/${txid}" target="_blank" rel="noopener">${txid.slice(0, 10)}…${txid.slice(-6)}</a>${t('sent_post')}`, 'ok');
   } catch (e) {
     $('btn-sign').disabled = false;
-    $('btn-sign').textContent = 'Подписать и отправить';
+    $('btn-sign').textContent = t('sign');
     msg('sign-msg', e.message || String(e));
   }
 };
+
+track('view');
+setLang(LANG);
 </script>
 </body>
 </html>
