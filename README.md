@@ -4,6 +4,8 @@ A small, **non-custodial** web tool to recover BTC that ordinals wallets lock as
 *"unavailable balance"* — the plain bitcoin trapped inside UTXOs that also carry an
 inscription or a rune.
 
+**▶ Live tool: https://satrescue.app/**
+
 > **Don't trust, verify.** This repository is the full source of the tool. Read
 > [`index.html`](index.html) before you connect any wallet. Your keys never leave your
 > machine — the page only ever receives a signature your own wallet produces.
