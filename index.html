@@ -177,7 +177,10 @@
       <li id="t-how4"></li>
     </ol>
   </section>
-  <footer id="t-footer"></footer>
+  <footer>
+    <div id="t-footer"></div>
+    <a id="t-src" href="https://github.com/OculusMans/sat-rescue" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;font-weight:600"></a>
+  </footer>
 </main>
 
 <script type="module">
@@ -224,6 +227,7 @@ const I18N = {
     how3: 'The site builds one transaction: inscription outputs go first, so inscriptions and runes land in a separate output on your address, and the rest comes as plain sats.',
     how4: 'Your wallet signs the transaction. The site never sees your keys and can’t send anything without your confirmation.',
     footer: 'Your wallet signs the transaction. The site never stores or sees your keys.',
+    src: 'Open source on GitHub ↗',
     sat: 'sat', out: 'out.', slow: 'slow', normal: 'normal', fast: 'fast',
     err_no_unisat: 'UniSat extension not found. Install it and refresh the page.',
     err_mainnet: 'Switch UniSat to Bitcoin mainnet.',
@@ -259,6 +263,7 @@ const I18N = {
     how3: 'Сайт собирает одну транзакцию: выходы с инскрипциями идут первыми, поэтому инскрипции и руны попадают в отдельный выход на вашем адресе, а остальное — чистыми сатоши.',
     how4: 'Транзакцию подписывает ваш кошелёк. Сайт не видит ключей и не может отправить ничего без вашего подтверждения.',
     footer: 'Транзакцию подписывает ваш кошелёк. Сайт не хранит и не видит ключей.',
+    src: 'Открытый код на GitHub ↗',
     sat: 'сат', out: 'вых.', slow: 'медленно', normal: 'обычно', fast: 'быстро',
     err_no_unisat: 'Расширение UniSat не найдено. Установите его и обновите страницу.',
     err_mainnet: 'Переключите UniSat на основную сеть Bitcoin (mainnet)',
@@ -324,6 +329,7 @@ function applyStatic() {
   $('t-how').textContent = t('how');
   for (let i = 1; i <= 4; i++) $('t-how' + i).textContent = t('how' + i);
   $('t-footer').textContent = t('footer');
+  $('t-src').textContent = t('src');
   $('btn-sign').textContent = t('sign');
 }
 
