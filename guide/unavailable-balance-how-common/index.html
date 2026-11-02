@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>"Unavailable balance" is one of the most common UniSat complaints. Here's why.</title>
+<meta name="description" content="If your UniSat wallet shows BTC as 'unavailable balance', you are far from alone. It is one of the most repeated questions in UniSat's own community. Here's why so much BTC stays stuck, and how to get yours out.">
+<link rel="canonical" href="https://satrescue.app/guide/unavailable-balance-how-common/">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#161617">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Sat Rescue">
+<meta property="og:title" content="'Unavailable balance' is one of the most common UniSat complaints. Here's why.">
+<meta property="og:description" content="Why so many people have BTC stuck as unavailable balance, and how to get yours out.">
+<meta property="og:url" content="https://satrescue.app/guide/unavailable-balance-how-common/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="'Unavailable balance' is one of the most common UniSat complaints">
+<meta name="twitter:description" content="Why so many people have BTC stuck as unavailable balance, and how to get yours out.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "headline": "\"Unavailable balance\" is one of the most common UniSat complaints. Here's why.",
+      "description": "Why BTC shown as unavailable balance is such a widespread problem among UniSat and ordinals users, and how to recover it.",
+      "author": { "@type": "Organization", "name": "Sat Rescue" },
+      "publisher": { "@type": "Organization", "name": "Sat Rescue" },
+      "mainEntityOfPage": "https://satrescue.app/guide/unavailable-balance-how-common/",
+      "datePublished": "2026-11-02",
+      "dateModified": "2026-11-02"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "Is unavailable balance a common problem?", "acceptedAnswer": { "@type": "Answer", "text": "Very. It is one of the most repeated questions in UniSat's own community channels and on ordinals forums, and it keeps coming up because anyone who mints runes or inscriptions runs into it." } },
+        { "@type": "Question", "name": "Why do so many people leave the BTC stuck?", "acceptedAnswer": { "@type": "Answer", "text": "Because there is no one-click fix in the wallet, the standard advice is to open a support ticket, and many people assume the coins are lost or not worth the effort of building a transaction by hand." } },
+        { "@type": "Question", "name": "Can I get my unavailable balance out myself?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The outputs are spendable; the wallet just will not spend them for you. You can sweep them by hand or with a tool, sending the freed BTC to a plain wallet or exchange." } }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+  :root {
+    --bg: #161617; --card: #1c1c1e; --text: #f5f5f7; --muted: #a1a1a6; --line: rgba(255,255,255,.1);
+    --accent: #ff9f0a; --accent-2: #ff7a00;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg: #f5f5f7; --card: #fff; --text: #1d1d1f; --muted: #6e6e73; --line: rgba(0,0,0,.1); --accent: #ff9500; --accent-2: #f06a00; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; color: var(--text); background: var(--bg);
+    font: 18px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+    letter-spacing: -0.011em;
+  }
+  main { max-width: 720px; margin: 0 auto; padding: 56px 20px 96px; }
+  .eyebrow { color: var(--accent); font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: .04em; margin: 0 0 12px; }
+  h1 { font-size: clamp(30px, 5.5vw, 44px); line-height: 1.12; letter-spacing: -0.03em; margin: 0 0 20px; }
+  h2 { font-size: clamp(22px, 3.5vw, 28px); line-height: 1.2; letter-spacing: -0.02em; margin: 44px 0 14px; }
+  h3 { font-size: 20px; margin: 28px 0 8px; }
+  p, li { color: var(--text); }
+  .lead { font-size: 20px; color: var(--muted); margin: 0 0 8px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ol, ul { padding-left: 22px; }
+  li { margin: 8px 0; }
+  blockquote { margin: 18px 0; padding: 10px 18px; border-left: 3px solid var(--accent); color: var(--muted); font-style: italic; }
+  .cta {
+    display: block; background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+    padding: 22px 24px; margin: 32px 0; text-align: center;
+  }
+  .cta a.btn {
+    display: inline-block; margin-top: 12px; background: linear-gradient(180deg, var(--accent), var(--accent-2));
+    color: #1c1c1e; font-weight: 700; padding: 12px 26px; border-radius: 980px; letter-spacing: -0.01em;
+  }
+  .cta a.btn:hover { filter: brightness(1.06); text-decoration: none; }
+  .note { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; color: var(--muted); font-size: 16px; }
+  footer { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 15px; }
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow"><a href="https://satrescue.app/">Sat Rescue</a> · Guide</p>
+  <h1>"Unavailable balance" is one of the most common UniSat complaints. Here's why.</h1>
+
+  <p class="lead">If part of your Bitcoin shows up as "unavailable" in UniSat and you feel like you have hit some rare edge case, you have not. This is one of the most repeated questions in the ordinals world, and the reason it keeps happening is baked into how these wallets work.</p>
+
+  <h2>How common is it, really</h2>
+  <p>Search "unavailable balance" inside UniSat's own community channels and you will find it asked over and over, month after month, straight through the most recent year. The same question shows up again and again on r/BitcoinOrdinals and in wallet support threads. It is not a one-off bug report. It is a steady stream of people discovering that a chunk of their BTC has quietly become un-spendable.</p>
+  <p>The phrasing is almost always the same:</p>
+  <blockquote>"I have unlocked all my UTXOs, so why do I still have unavailable balance showing in my UniSat?"</blockquote>
+  <blockquote>"Where can I find real info on unavailable balance? The link in the FAQ says the page is not found."</blockquote>
+  <p>Different people, same wall. And the standard answer they get is almost always the same too: open a support ticket, or go check your UTXOs manually. There is no button that just fixes it.</p>
+
+  <h2>Why it hits so many people</h2>
+  <p>The mechanism is simple and unavoidable. Every rune or inscription you mint lands on its own tiny output, usually around 546 satoshis. Ordinals-aware wallets lock any output carrying a collectible so you do not spend it as a fee. The plain BTC trapped inside those outputs then shows as "unavailable balance". We wrote up the full mechanism here: <a href="https://satrescue.app/guide/unisat-unavailable-balance/">why your UniSat wallet shows "unavailable balance"</a>.</p>
+  <p>So anyone who farmed the UniSat airdrop, minted a batch of runes, or traded inscriptions ends up with dozens or hundreds of these locked dust outputs. The more active you were, the more BTC ends up frozen in plain sight. That is why it is not a niche problem: it is the default outcome of using the wallet the way it was meant to be used.</p>
+
+  <h2>Why so much of it just sits there</h2>
+  <p>Here is the part worth saying plainly. A lot of this BTC never gets recovered, and not because it cannot be. It stays stuck because:</p>
+  <ul>
+    <li>There is no one-click recovery in the wallet. The advice is "open a ticket."</li>
+    <li>Doing it by hand means building a raw transaction and ordering inscribed inputs correctly, which most people will not do.</li>
+    <li>Many people assume "unavailable" means "lost" and quietly give up.</li>
+  </ul>
+  <p>None of that is true. The outputs are ordinary spendable Bitcoin. The wallet is simply choosing not to spend them for you.</p>
+  <p class="note">We cannot put an exact dollar figure on how much BTC is sitting locked this way, because that would mean scanning every affected wallet. But per person it ranges from a few dollars of dust up to real amounts for heavy airdrop farmers, and there are clearly a lot of those people.</p>
+
+  <h2>How to actually get it out</h2>
+  <p>You have two honest options, and the manual one is free:</p>
+  <ol>
+    <li><strong>By hand.</strong> Build a transaction that spends the locked UTXOs, put the inscribed inputs first so a collectible does not land in the fee, and send the freed BTC to an exchange or a plain wallet like Electrum or Sparrow. Full walkthrough: <a href="https://satrescue.app/guide/spend-inscription-utxo/">how to spend an inscription or rune UTXO</a>.</li>
+    <li><strong>With a tool.</strong> <a href="https://satrescue.app/">Sat Rescue</a> builds that sweep transaction for you. You connect read only, it separates collectibles from plain dust, and your own wallet shows you the transaction to sign. Keys never reach the site.</li>
+  </ol>
+  <p>It is open source, so you can read exactly what it does first: <a href="https://github.com/OculusMans/sat-rescue" target="_blank" rel="noopener">github.com/OculusMans/sat-rescue</a>. It charges 17% of what it recovers, shown in your wallet before you sign, and skips the fee on amounts too small to matter. If you send the freed sats to another ordinals wallet they just lock again, so send to a plain wallet or an exchange.</p>
+
+  <div class="cta">
+    <strong>Check what's actually recoverable</strong>
+    <p style="margin:6px 0 0;color:var(--muted);font-size:16px">Non-custodial. You sign it yourself. Open source.</p>
+    <a class="btn" href="https://satrescue.app/">Open Sat Rescue</a>
+  </div>
+
+  <h2>FAQ</h2>
+  <h3>Is unavailable balance a common problem?</h3>
+  <p>Very. It is one of the most repeated questions in UniSat's own community and on ordinals forums, because anyone who mints runes or inscriptions runs into it.</p>
+  <h3>Why do so many people leave the BTC stuck?</h3>
+  <p>There is no one-click fix in the wallet, the standard advice is to open a support ticket, and many people assume the coins are lost or not worth the hassle.</p>
+  <h3>Can I get my unavailable balance out myself?</h3>
+  <p>Yes. The outputs are spendable; the wallet just will not spend them for you. Sweep them by hand or with a tool and send the freed BTC to a plain wallet or exchange.</p>
+
+  <footer>
+    <p>Related: <a href="https://satrescue.app/guide/unisat-unavailable-balance/">Why your UniSat wallet shows "unavailable balance"</a> · <a href="https://satrescue.app/guide/spend-inscription-utxo/">How to spend a UTXO with an inscription or rune</a></p>
+    <p>Sat Rescue is a free, non-custodial tool. Live tool: <a href="https://satrescue.app/">satrescue.app</a> · Source: <a href="https://github.com/OculusMans/sat-rescue" target="_blank" rel="noopener">github.com/OculusMans/sat-rescue</a></p>
+  </footer>
+</main>
+</body>
+</html>
