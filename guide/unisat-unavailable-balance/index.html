@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why your UniSat wallet shows "unavailable balance" (and how to get that BTC out)</title>
+<meta name="description" content="Part of your Bitcoin shows as 'unavailable' in UniSat or Xverse and the Send button won't touch it? Here's exactly why, and how to move that BTC, by hand and with a tool.">
+<link rel="canonical" href="https://satrescue.app/guide/unisat-unavailable-balance/">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#161617">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Sat Rescue">
+<meta property="og:title" content="Why your UniSat wallet shows 'unavailable balance' (and how to get that BTC out)">
+<meta property="og:description" content="Why ordinals wallets lock your BTC as 'unavailable balance', and how to sweep it out by hand or with a tool.">
+<meta property="og:url" content="https://satrescue.app/guide/unisat-unavailable-balance/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Why your UniSat wallet shows 'unavailable balance'">
+<meta name="twitter:description" content="Why ordinals wallets lock your BTC as 'unavailable balance', and how to sweep it out.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "headline": "Why your UniSat wallet shows \"unavailable balance\" (and how to get that BTC out)",
+      "description": "Why ordinals and runes wallets lock your Bitcoin as 'unavailable balance', and how to move it out by hand or with a tool.",
+      "author": { "@type": "Organization", "name": "Sat Rescue" },
+      "publisher": { "@type": "Organization", "name": "Sat Rescue" },
+      "mainEntityOfPage": "https://satrescue.app/guide/unisat-unavailable-balance/",
+      "datePublished": "2026-11-02",
+      "dateModified": "2026-11-02"
+    },
+    {
+      "@type": "HowTo",
+      "name": "How to recover BTC stuck as unavailable balance in an ordinals wallet",
+      "description": "Sweep plain Bitcoin out of UTXOs that carry runes or inscriptions and are locked by your wallet.",
+      "step": [
+        { "@type": "HowToStep", "name": "List the locked UTXOs", "text": "List the UTXOs on your address using a block explorer or your wallet's UTXO view, and find the ones carrying an inscription or rune." },
+        { "@type": "HowToStep", "name": "Build the sweep transaction", "text": "Build a PSBT that spends those UTXOs, ordering the inscribed inputs first so a collectible does not land in the miner fee." },
+        { "@type": "HowToStep", "name": "Send to a plain wallet or exchange", "text": "Send the swept sats to an exchange deposit address or a plain wallet like Electrum, Sparrow or Ledger. Sending to another ordinals wallet locks them again." },
+        { "@type": "HowToStep", "name": "Sign and broadcast", "text": "Review the amounts and outputs, sign the transaction in your own wallet, and broadcast it." }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "Will I lose my inscriptions or runes?", "acceptedAnswer": { "@type": "Answer", "text": "No, unless you specifically choose a burn mode. The normal flow keeps your collectibles in a separate output on your own address and only frees the plain BTC." } },
+        { "@type": "Question", "name": "Is connecting my wallet safe?", "acceptedAnswer": { "@type": "Answer", "text": "A non-custodial tool never receives your seed or private key, only a signature your own wallet produces, and you review the transaction before signing. Verify the code and the transaction yourself." } },
+        { "@type": "Question", "name": "Why does the wallet lock these in the first place?", "acceptedAnswer": { "@type": "Answer", "text": "To stop you from accidentally spending a collectible as a network fee. It is a safety feature with an annoying side effect." } }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+  :root {
+    --bg: #161617; --card: #1c1c1e; --text: #f5f5f7; --muted: #a1a1a6; --line: rgba(255,255,255,.1);
+    --accent: #ff9f0a; --accent-2: #ff7a00;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg: #f5f5f7; --card: #fff; --text: #1d1d1f; --muted: #6e6e73; --line: rgba(0,0,0,.1); --accent: #ff9500; --accent-2: #f06a00; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; color: var(--text); background: var(--bg);
+    font: 18px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+    letter-spacing: -0.011em;
+  }
+  main { max-width: 720px; margin: 0 auto; padding: 56px 20px 96px; }
+  .eyebrow { color: var(--accent); font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: .04em; margin: 0 0 12px; }
+  h1 { font-size: clamp(30px, 5.5vw, 44px); line-height: 1.12; letter-spacing: -0.03em; margin: 0 0 20px; }
+  h2 { font-size: clamp(22px, 3.5vw, 28px); line-height: 1.2; letter-spacing: -0.02em; margin: 44px 0 14px; }
+  h3 { font-size: 20px; margin: 28px 0 8px; }
+  p, li { color: var(--text); }
+  .lead { font-size: 20px; color: var(--muted); margin: 0 0 8px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ol, ul { padding-left: 22px; }
+  li { margin: 8px 0; }
+  .cta {
+    display: block; background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+    padding: 22px 24px; margin: 32px 0; text-align: center;
+  }
+  .cta a.btn {
+    display: inline-block; margin-top: 12px; background: linear-gradient(180deg, var(--accent), var(--accent-2));
+    color: #1c1c1e; font-weight: 700; padding: 12px 26px; border-radius: 980px; letter-spacing: -0.01em;
+  }
+  .cta a.btn:hover { filter: brightness(1.06); text-decoration: none; }
+  .note { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; color: var(--muted); font-size: 16px; }
+  footer { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 15px; }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 40px 0; }
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow"><a href="https://satrescue.app/">Sat Rescue</a> · Guide</p>
+  <h1>Why your UniSat wallet shows "unavailable balance" (and how to get that BTC out)</h1>
+
+  <p class="lead">If you opened UniSat (or Xverse, or another ordinals wallet) and part of your Bitcoin shows up as "unavailable" and the Send button won't touch it, you are not alone and your coins are not lost. This explains exactly what is happening and how to move that BTC, both by hand and with a tool.</p>
+
+  <h2>What "unavailable balance" actually means</h2>
+  <p>Every time you mint a rune or an inscription, it lands on a specific tiny output in your wallet, usually around 546 satoshis. That output now carries a collectible.</p>
+  <p>Ordinals-aware wallets deliberately lock any output that carries an inscription or a rune. The reason is protective: they don't want you to accidentally spend a valuable collectible as a network fee. The side effect is that the plain Bitcoin value sitting inside those outputs gets grouped as "unavailable balance", and the normal Send flow refuses to spend it.</p>
+  <p>So the coins are yours, you can see them, but the wallet UI will not move them. For people who farmed the UniSat airdrop or minted a lot of runes, this can add up to a real amount of BTC frozen in plain sight across dozens or hundreds of tiny outputs.</p>
+
+  <h2>Is it recoverable? Yes.</h2>
+  <p>Nothing is stuck on the blockchain. The outputs are spendable like any other, the wallet is just choosing not to spend them for you. You have two ways to get the BTC out.</p>
+
+  <h2>Option A: do it by hand (free)</h2>
+  <p>If you are comfortable with raw transactions, you can sweep these outputs yourself:</p>
+  <ol>
+    <li>List the locked UTXOs on your address using a block explorer or your wallet's UTXO view.</li>
+    <li>Build a transaction (a PSBT) that spends them.</li>
+    <li>Order the inputs that carry inscriptions first, and size the first output so the collectible sats land there, not in the miner fee or the wrong output.</li>
+    <li>Sign with a wallet that will build this kind of transaction. Sparrow or Electrum, pointed at your address, work for plain-BTC sweeps.</li>
+  </ol>
+  <p class="note">One important detail: if you send the swept sats to another ordinals-aware wallet (UniSat, Xverse), they get locked again there. To treat them as plain Bitcoin, send to an exchange deposit address or a plain wallet like Electrum, Sparrow, or Ledger.</p>
+  <p>Across a lot of dust outputs this is fiddly and easy to get wrong, which is why most people leave the BTC sitting there.</p>
+
+  <h2>Option B: use a tool that does the assembly</h2>
+  <p>If you don't want to build PSBTs by hand, <a href="https://satrescue.app/">Sat Rescue</a> automates it:</p>
+  <ol>
+    <li>You connect your wallet. It reads your address and public key only (read only).</li>
+    <li>It scans your UTXOs, separates the inscription and rune outputs from plain dust, and builds the sweep transaction.</li>
+    <li>You pick a mode: keep the clean BTC in your own wallet (collectibles stay segregated in a single output), or send everything to an external address like an exchange.</li>
+    <li>Your wallet shows you the transaction and you sign it. The site never sees your keys.</li>
+  </ol>
+  <p>It is open source, so you can read exactly what it does before you connect anything: <a href="https://github.com/OculusMans/sat-rescue" target="_blank" rel="noopener">github.com/OculusMans/sat-rescue</a>. It takes a 17% fee on what it recovers, shown in your wallet before you sign, and it skips the fee entirely on amounts too small to be worth it.</p>
+
+  <div class="cta">
+    <strong>Recover your stuck BTC</strong>
+    <p style="margin:6px 0 0;color:var(--muted);font-size:16px">Non-custodial. You sign it in your own wallet. Open source.</p>
+    <a class="btn" href="https://satrescue.app/">Open Sat Rescue</a>
+  </div>
+
+  <h2>Do it while network fees are low</h2>
+  <p>Consolidating many tiny outputs costs network fees per output. While fees are low this is cheap. When fees spike, sweeping small dust can cost more than it recovers. If you have been putting this off, low-fee periods are the time to do it.</p>
+
+  <h2>FAQ</h2>
+  <h3>Will I lose my inscriptions or runes?</h3>
+  <p>No, unless you specifically choose a burn mode. The normal flow keeps your collectibles in a separate output on your own address and only frees the plain BTC.</p>
+  <h3>Is connecting my wallet safe?</h3>
+  <p>The tool is non-custodial and open source: it never receives your seed or private key, only a signature your own wallet produces, and you review the transaction before signing. As always, verify the code and the transaction yourself.</p>
+  <h3>Why does the wallet lock these in the first place?</h3>
+  <p>To stop you from accidentally spending a collectible as a fee. It is a safety feature with an annoying side effect.</p>
+
+  <footer>
+    <p>Sat Rescue is a free, non-custodial tool. Live tool: <a href="https://satrescue.app/">satrescue.app</a> · Source: <a href="https://github.com/OculusMans/sat-rescue" target="_blank" rel="noopener">github.com/OculusMans/sat-rescue</a></p>
+  </footer>
+</main>
+</body>
+</html>

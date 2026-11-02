@@ -3,7 +3,61 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sat Rescue</title>
+<title>Sat Rescue: recover BTC stuck as "unavailable balance" in UniSat / Xverse</title>
+<meta name="description" content="Free, non-custodial tool to recover Bitcoin locked as 'unavailable balance' in ordinals and runes wallets like UniSat and Xverse. You sign the sweep in your own wallet. Open source.">
+<link rel="canonical" href="https://satrescue.app/">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#161617">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sat Rescue">
+<meta property="og:title" content="Recover BTC stuck as 'unavailable balance' in UniSat / Xverse">
+<meta property="og:description" content="Free, non-custodial tool that sweeps Bitcoin locked in ordinals/runes UTXOs. You sign it yourself. Open source.">
+<meta property="og:url" content="https://satrescue.app/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Recover BTC stuck as 'unavailable balance' in UniSat / Xverse">
+<meta name="twitter:description" content="Free, non-custodial tool that sweeps Bitcoin locked in ordinals/runes UTXOs. You sign it yourself. Open source.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "Sat Rescue",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web",
+      "url": "https://satrescue.app/",
+      "description": "Free, non-custodial web tool that sweeps Bitcoin locked as 'unavailable balance' in ordinals and runes wallets (UniSat, Xverse). The user signs the transaction in their own wallet; keys never reach the site.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "isAccessibleForFree": true
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why does my UniSat wallet show BTC as 'unavailable balance'?",
+          "acceptedAnswer": { "@type": "Answer", "text": "That BTC sits in tiny UTXOs that also carry a rune or an inscription. Ordinals-aware wallets lock those outputs on purpose so you do not spend a collectible as a network fee, so the normal Send button will not touch them." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is the stuck Bitcoin recoverable?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Nothing is stuck on the blockchain. The outputs are spendable like any other; the wallet is just choosing not to spend them for you. You can sweep them by hand or with a tool." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Sat Rescue safe to connect my wallet to?",
+          "acceptedAnswer": { "@type": "Answer", "text": "It is non-custodial and open source. The site never receives your seed or private key, only a signature your own wallet produces, and you review the transaction before signing." }
+        },
+        {
+          "@type": "Question",
+          "name": "Will I lose my inscriptions or runes?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The normal flow keeps your collectibles segregated in a separate output on your own address and only frees the plain BTC." }
+        }
+      ]
+    }
+  ]
+}
+</script>
 <style>
   /* Графит + оранжевый в духе Apple. Тёмная графитовая тема по умолчанию, светлая — по настройке системы. */
   :root {
@@ -180,6 +234,7 @@
   <footer>
     <div id="t-footer"></div>
     <a id="t-src" href="https://github.com/OculusMans/sat-rescue" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;font-weight:600"></a>
+    <div style="margin-top:10px"><a href="/guide/unisat-unavailable-balance/" style="font-weight:600">Guide: why UniSat shows "unavailable balance" and how to fix it &rsaquo;</a></div>
   </footer>
 </main>
 
